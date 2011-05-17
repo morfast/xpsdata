@@ -14,80 +14,119 @@ def is_one(line):
     return False
 
 
-def process(lines):
-    """ process data and generate new form of table """
+def process(lines, filename):
+    """ process the buff of one single file
+        The buff may contain one or mutiple block(s)
+        format each buff into the following structure:
+            [ "filename", elem_num, label(atom), [first column], [second column] ]
+        and add it to AllBuf
+    """
     length = len(lines)
-    label = ""
+    label = ""    # atom label
+    elem_num = 0  # number of data in one block
     i = 0
-    res = []
-    max_line_num = 0
+    res = []      # a structure for one block
 
     while i < length:
         if is_one(lines[i]):
+            res = []
             label = lines[i-1].strip()
             i += 1
             start_val = float(lines[i])
             i += 1
             inteval = float(lines[i])
             i += 1
-            line_num = int(lines[i])
-
-            if line_num > max_line_num:
-                max_line_num = line_num
+            elem_num = int(lines[i])
+            res.append(filename)
+            res.append(elem_num)
+            res.append(label)
 
             first_row = []
             second_row = []
-            sub_res = []
-            while line_num > 0:
+
+            while elem_num > 0:
                 first_row.append(start_val)
                 start_val += inteval
-                line_num -= 1
-
+                elem_num -= 1
                 i += 1
                 second_row.append(float(lines[i]))
-            sub_res.append(label)
-            sub_res.append(first_row)
-            sub_res.append(second_row)
-            res.append(sub_res)
+
+            res.append(first_row)
+            res.append(second_row)
+            AllBuf.append(res)
 
         i += 1
 
-    return res, max_line_num
+def SortBuf():
+    """ sort AllBuf according to the label (atom) """
+    length = len(AllBuf)
 
-def output(result, maxn, outfile):
-    """ output buffer """
-    ofile.write("%s\n" % outfile.name)
-    for subres in result:
-        ofile.write("%s," % subres[0])
-        ofile.write("%s," % subres[0])
-
-    ofile.write("\n")
-    ofile.write("\n")
-    ofile.write("\n")
     i = 0
-    while i < maxn:
-        for subres in result:
-            if i < len(subres[1]):
-                outfile.write( "%7.4f," % (subres[1][i]))
-            else:
-                outfile.write( "%8s," % ""),
-
-            if i < len(subres[2]):
-                outfile.write( "%8.4f," % (subres[2][i]))
-            else:
-                outfile.write( "%9s," % ""),
-        outfile.write("\n")
+    while (i < length):
+        j = i
+        while j < length:
+            if AllBuf[i][2] > AllBuf[j][2]:
+                AllBuf[i], AllBuf[j] = AllBuf[j], AllBuf[i]
+            j += 1
         i += 1
+
+
+def OutPut():
+    """ output buffer """
+    length = len(AllBuf)
+    head = tail = 0
+    while True:
+        head = tail
+        while AllBuf[tail][2] == AllBuf[head][2]:
+            tail += 1
+            if tail >= length:
+                return
+
+        print head, tail
+
+        ofilename = AllBuf[head][2]
+        f = open(ofilename + ".txt", 'w')
+
+        bufi = head
+        while bufi < tail:
+            f.write("%s,%s," % (AllBuf[bufi][0],AllBuf[bufi][0]))
+            bufi += 1
+        f.write('\n')
+
+        elemi = 0
+        elem_num = AllBuf[head][1]
+        while elemi < elem_num:
+            bufi = head
+            while bufi < tail:
+                f.write( "%f,%f," % (AllBuf[bufi][3][elemi], AllBuf[bufi][4][elemi]) )
+                bufi += 1
+            elemi += 1
+            f.write('\n')
+        
+        
+
+
+    
+
+def testoutput():
+    for buf in AllBuf:
+        print buf[0], buf[1], buf[2], buf[3][0]
+
 
 for f in sys.argv[1:]:
-
-    print "processing %s..." % f,
+    print "processing %s..." % f
     buf = open(f,'r').readlines()
-    ofilename = f.replace('.asc','_result.csv')
-    ofile = open(ofilename,'w')
-    result,maxn = process(buf)
-    output(result,maxn,ofile)
+    process(buf, f.replace('.asc',''))
     print 'Done'
+
+SortBuf()
+testoutput()
+OutPut()
+
+    #ofilename = f.replace('.asc','_result.csv')
+    #ofile = open(ofilename,'w')
+    #result,maxn = process(buf)
+    #output(result,maxn,ofile)
 #for subres in result:
 #    for i in subres:
 #        print i
