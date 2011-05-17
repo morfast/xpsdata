@@ -71,6 +71,19 @@ def SortBuf():
             j += 1
         i += 1
 
+def FindMaxLen(head,tail):
+    """ find the max elem_num between AllBuf[head] and AllBuf[tail] """
+    maxlen = 0
+    ibuf = head
+    while ibuf < tail:
+        if maxlen < AllBuf[ibuf][1]:
+            maxlen = AllBuf[ibuf][1]
+        ibuf += 1
+
+    return maxlen
+
+
+
 
 def OutPut():
     """ output buffer """
@@ -96,12 +109,14 @@ def OutPut():
         f.write('\n')
 
         elemi = 0
-        elem_num = AllBuf[head][1]
+        elem_num = FindMaxLen(head, tail)
         while elemi < elem_num:
             bufi = head
             while bufi < tail:
                 if elemi < AllBuf[bufi][1]:
                     f.write( "%7.4f,%8.4f" % (AllBuf[bufi][3][elemi], AllBuf[bufi][4][elemi]) )
+                else:
+                    f.write(" , ")
                 if bufi+1 < tail:
                     f.write(",")
                 bufi += 1
