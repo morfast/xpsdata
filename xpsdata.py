@@ -4,6 +4,7 @@
 
 import re
 import sys
+import glob
 
 AllBuf = []
 
@@ -82,14 +83,15 @@ def OutPut():
             if tail >= length:
                 return
 
-        print head, tail
-
-        ofilename = AllBuf[head][2]
-        f = open(ofilename + ".txt", 'w')
+        ofilename = AllBuf[head][2] + ".csv"
+        f = open(ofilename, 'w')
+        print "Output to %s..." % ofilename,
 
         bufi = head
         while bufi < tail:
-            f.write("%s,%s," % (AllBuf[bufi][0],AllBuf[bufi][0]))
+            f.write("%s,%s" % (AllBuf[bufi][0],AllBuf[bufi][0]))
+            if bufi+1 < tail:
+                f.write(",")
             bufi += 1
         f.write('\n')
 
@@ -98,10 +100,15 @@ def OutPut():
         while elemi < elem_num:
             bufi = head
             while bufi < tail:
-                f.write( "%f,%f," % (AllBuf[bufi][3][elemi], AllBuf[bufi][4][elemi]) )
+                if elemi < AllBuf[bufi][1]:
+                    f.write( "%7.4f,%8.4f" % (AllBuf[bufi][3][elemi], AllBuf[bufi][4][elemi]) )
+                if bufi+1 < tail:
+                    f.write(",")
                 bufi += 1
             elemi += 1
             f.write('\n')
+
+        print "OK"
         
         
 
@@ -113,11 +120,20 @@ def testoutput():
         print buf[0], buf[1], buf[2], buf[3][0]
 
 
-for f in sys.argv[1:]:
-    print "processing %s..." % f
+filelist = glob.glob("*.asc")
+if not filelist:
+    sys.stderr.write("NO .asc file found")
+    exit(1)
+
+print filelist
+print sys.argv[1:]
+
+for f in filelist:
+    print "processing %s..." % f ,
     buf = open(f,'r').readlines()
     process(buf, f.replace('.asc',''))
     print 'Done'
+
 
 SortBuf()
 testoutput()
