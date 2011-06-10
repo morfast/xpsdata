@@ -27,6 +27,7 @@ def process(lines, filename):
     elem_num = 0  # number of data in one block
     i = 0
     res = []      # a structure for one block
+    filename = '-'.join(filename.strip().split('-')[0:-1])
 
     while i < length:
         if is_one(lines[i]):
