@@ -82,9 +82,6 @@ def FindMaxLen(head,tail):
 
     return maxlen
 
-
-
-
 def OutPut():
     """ output buffer """
     length = len(AllBuf)
@@ -94,7 +91,7 @@ def OutPut():
         while AllBuf[tail][2] == AllBuf[head][2]:
             tail += 1
             if tail >= length:
-                return
+                break
 
         ofilename = AllBuf[head][2] + ".csv"
         f = open(ofilename, 'w')
@@ -124,12 +121,10 @@ def OutPut():
             f.write('\n')
 
         print "OK"
+
+        if tail >= length:
+            return
         
-        
-
-
-    
-
 def testoutput():
     for buf in AllBuf:
         print buf[0], buf[1], buf[2], buf[3][0]
@@ -140,8 +135,6 @@ if not filelist:
     sys.stderr.write("NO .asc file found")
     exit(1)
 
-print filelist
-print sys.argv[1:]
 
 for f in filelist:
     print "processing %s..." % f ,
@@ -151,13 +144,5 @@ for f in filelist:
 
 
 SortBuf()
-testoutput()
 OutPut()
 
-    #ofilename = f.replace('.asc','_result.csv')
-    #ofile = open(ofilename,'w')
-    #result,maxn = process(buf)
-    #output(result,maxn,ofile)
-#for subres in result:
-#    for i in subres:
-#        print i
